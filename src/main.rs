@@ -36,6 +36,7 @@ fn run() -> i32 {
     opts.optopt("i", "id", "Window to capture", "ID");
     opts.optopt("g", "geometry", "Area to capture", "WxH+X+Y");
     opts.optopt("f", "format", "Output format", "png/pam");
+    opts.optopt("o", "output", "Output directory", "path");
     opts.optflag(
         "s",
         "single-screen",
@@ -90,6 +91,15 @@ fn run() -> i32 {
             }
         },
         None => root,
+    };
+
+    let output_path = match matches.opt_str("o") {
+        Some(s) => if s.ends_with("/") {
+            s
+        } else {
+            s + "/"
+        },
+        None => "./".to_string(),
     };
 
     let output_ext = matches
@@ -230,7 +240,7 @@ fn run() -> i32 {
         };
         format!("{now}.{output_ext}")
     };
-    let path = match matches.free.get(0) {
+    let path = output_path + match matches.free.get(0) {
         Some(p) => p,
         None => {
             eprintln!("No output specified, defaulting to {ts_path}");
